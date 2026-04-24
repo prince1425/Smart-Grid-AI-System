@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Grid AI – Live Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="logo">&#9889;</span>
+            <h1>Smart Grid AI</h1>
+            <span class="tag">Real-time Monitoring &middot; ML Forecasting &middot; Fault Detection</span>
+        </div>
+        <div class="controls">
+            <button id="refreshBtn" class="btn primary">Refresh</button>
+            <button id="simulateBtn" class="btn">Start Simulation</button>
+            <button id="voiceBtn" class="btn">Speak Usage</button>
+            <a id="exportBtn" class="btn" href="/export-csv">Export CSV</a>
+        </div>
+    </header>
+
+    <main class="grid">
+
+        <!-- KPI cards -->
+        <section class="card kpi">
+            <h3>Current Demand</h3>
+            <div class="kpi-value" id="currentValue">--</div>
+            <div class="kpi-label">MWh</div>
+            <div class="status" id="statusBadge">Loading...</div>
+        </section>
+
+        <section class="card kpi">
+            <h3>24h Peak Forecast</h3>
+            <div class="kpi-value" id="peakValue">--</div>
+            <div class="kpi-label">MWh (predicted)</div>
+            <div class="muted" id="peakTime">--</div>
+        </section>
+
+        <section class="card kpi">
+            <h3>Anomalies (48h)</h3>
+            <div class="kpi-value alert" id="anomalyCount">--</div>
+            <div class="kpi-label">detected</div>
+            <div class="muted" id="modelMetrics">--</div>
+        </section>
+
+        <section class="card kpi">
+            <h3>Data Source</h3>
+            <div class="kpi-value small" id="sourceLabel">--</div>
+            <div class="kpi-label">EIA API / Mock</div>
+            <div class="muted" id="lastUpdated">--</div>
+        </section>
+
+        <!-- Main chart -->
+        <section class="card wide">
+            <div class="card-header">
+                <h3>Energy Demand vs Time</h3>
+                <span class="muted">Live observed + ML forecast</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="demandChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Anomaly chart -->
+        <section class="card wide">
+            <div class="card-header">
+                <h3>Fault / Anomaly Detection</h3>
+                <span class="muted">Isolation Forest</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="anomalyChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Optimization suggestions -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Optimization Suggestions</h3>
+            </div>
+            <ul id="suggestionList" class="suggestions">
+                <li class="muted">Loading...</li>
+            </ul>
+        </section>
+
+        <!-- Alerts feed -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Alerts Feed</h3>
+            </div>
+            <ul id="alertFeed" class="alerts">
+                <li class="muted">No alerts yet.</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="foot">
+        <span>&copy; Smart Grid AI</span>
+        <span class="muted" id="simStatus">Auto-refresh: OFF</span>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
