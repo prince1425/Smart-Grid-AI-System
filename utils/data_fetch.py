@@ -92,7 +92,7 @@ def generate_mock_data(hours: int = DEFAULT_HOURS,
     Generate synthetic electricity demand data that mimics a real diurnal
     load curve (peaks in the morning and evening, troughs overnight).
     """
-    now = dt.datetime.utcnow().replace(minute=0, second=0, microsecond=0)
+    now = dt.datetime.now(dt.timezone.utc).replace(minute=0, second=0, microsecond=0)
     data = []
 
     # Base daily peak in MWh

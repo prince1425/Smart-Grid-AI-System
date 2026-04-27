@@ -98,7 +98,7 @@ def dashboard():
 
 @app.route("/health")
 def health():
-    return jsonify({"ok": True, "time": dt.datetime.utcnow().isoformat()})
+    return jsonify({"ok": True, "time": dt.datetime.now(dt.timezone.utc).isoformat()})
 
 
 @app.route("/get-energy-data")
@@ -132,10 +132,11 @@ def get_energy():
 def predict():
     """Forecast electricity load for the next N hours."""
     try:
+        region = request.args.get("region", "PACW")
         horizon = int(request.args.get("horizon", 24))
         bundle = _ensure_model()
 
-        result = get_energy_data(hours=24)
+        result = get_energy_data(region=region, hours=24)
         df = build_features(result["data"])
         if df.empty:
             return json_error("No data available for prediction", 400)
@@ -168,10 +169,11 @@ def predict():
 def detect_fault():
     """Run Isolation Forest on recent data and flag anomalies."""
     try:
+        region = request.args.get("region", "PACW")
         hours = int(request.args.get("hours", 48))
         bundle = _ensure_model()
 
-        result = get_energy_data(hours=hours)
+        result = get_energy_data(region=region, hours=hours)
         df = build_features(result["data"])
         if df.empty:
             return json_error("No data available for fault detection", 400)
@@ -234,8 +236,9 @@ def historical():
 def optimize():
     """Very simple rule-based optimization suggestions."""
     try:
+        region = request.args.get("region", "PACW")
         bundle = _ensure_model()
-        result = get_energy_data(hours=24)
+        result = get_energy_data(region=region, hours=24)
         df = build_features(result["data"])
         if df.empty:
             return json_error("No data available for optimization", 400)
@@ -310,7 +313,7 @@ def export_csv():
 
         mem = io.BytesIO(buf.getvalue().encode("utf-8"))
         mem.seek(0)
-        filename = f"smart_grid_{dt.datetime.utcnow():%Y%m%d_%H%M}.csv"
+        filename = f"smart_grid_{dt.datetime.now(dt.timezone.utc):%Y%m%d_%H%M}.csv"
         return send_file(
             mem,
             mimetype="text/csv",
