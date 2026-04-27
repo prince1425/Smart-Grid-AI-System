@@ -22,7 +22,10 @@ import pandas as pd
 
 from sklearn.ensemble import RandomForestRegressor, IsolationForest
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.metrics import (
+    mean_absolute_error, r2_score, mean_squared_error,
+    precision_score, recall_score, f1_score
+)
 from sklearn.model_selection import train_test_split
 
 # Make local package importable when run as a script
@@ -62,8 +65,10 @@ def train_models(df: pd.DataFrame) -> dict:
     preds = regressor.predict(X_test)
 
     mae = mean_absolute_error(y_test, preds)
+    mse = mean_squared_error(y_test, preds)
+    rmse = np.sqrt(mse)
     r2 = r2_score(y_test, preds)
-    print(f"[Forecaster] MAE={mae:.2f}  R2={r2:.3f}")
+    print(f"[Forecaster] MAE={mae:.2f}  MSE={mse:.2f}  RMSE={rmse:.2f}  R2={r2:.3f}")
 
     # Baseline linear model for comparison (kept for transparency)
     linear = LinearRegression().fit(X_train, y_train)
@@ -88,12 +93,27 @@ def train_models(df: pd.DataFrame) -> dict:
         "value_min": float(df["value"].min()),
     }
 
+    # Evaluate Anomaly Detector using statistical heuristics as pseudo ground-truth
+    pred_labels = iso_forest.predict(anomaly_features)
+    pred_anomalies = (pred_labels == -1).astype(int)
+    
+    true_anomalies = ((df["value"] > stats["value_mean"] + 2 * stats["value_std"]) | 
+                      (df["value"] < stats["value_mean"] - 2 * stats["value_std"])).astype(int)
+    
+    precision = precision_score(true_anomalies, pred_anomalies, zero_division=0)
+    recall = recall_score(true_anomalies, pred_anomalies, zero_division=0)
+    f1 = f1_score(true_anomalies, pred_anomalies, zero_division=0)
+    print(f"[AnomalyDetector] Precision={precision:.3f}  Recall={recall:.3f}  F1={f1:.3f}")
+
     bundle = {
         "regressor": regressor,
         "linear_baseline": linear,
         "anomaly": iso_forest,
         "feature_cols": FEATURE_COLUMNS,
-        "metrics": {"mae": mae, "r2": r2, "linear_r2": lin_r2},
+        "metrics": {
+            "mae": mae, "mse": mse, "rmse": rmse, "r2": r2, "linear_r2": lin_r2,
+            "anomaly_precision": float(precision), "anomaly_recall": float(recall), "anomaly_f1": float(f1)
+        },
         "stats": stats,
     }
     return bundle
