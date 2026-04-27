@@ -8,7 +8,7 @@ A production-style, end-to-end **Smart Grid AI** application built with **Flask 
 
 The system simulates the core responsibilities of a smart grid control center:
 
-- Pulls live hourly demand from the EIA (`/v2/electricity/rto/region-data/`)
+- Pulls live hourly demand from the EIA (`/v2/electricity/rto/region-data/data/`)
 - Falls back to a realistic synthetic load curve when the API is unavailable
 - Trains two ML models at startup (or on demand) and serializes them to `model.pkl`
 - Exposes a clean REST API consumed by a single-page dashboard
@@ -45,15 +45,15 @@ The system simulates the core responsibilities of a smart grid control center:
 ## Project Structure
 
 ```
-smart-grid/
+Smart-Grid-AI-System/
+├── .gitignore
 ├── app.py                  # Flask backend & REST API
 ├── train_model.py          # Train/save ML models
-├── model.pkl               # Serialized ML bundle (generated)
 ├── requirements.txt
 ├── README.md
 ├── static/
-│   ├── style.css
-│   └── script.js
+│   ├── script.js
+│   └── style.css
 ├── templates/
 │   └── index.html
 └── utils/
@@ -61,6 +61,10 @@ smart-grid/
     ├── data_fetch.py       # EIA API + mock generator
     └── preprocessing.py    # Cleaning + feature engineering
 ```
+
+> [!NOTE]
+> `model.pkl` is generated after running `train_model.py`.
+
 
 ---
 
@@ -92,7 +96,7 @@ curl "http://localhost:5000/predict-load?horizon=24"
 ### 1. Clone and install
 
 ```bash
-cd smart-grid
+cd Smart-Grid-AI-System
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -137,11 +141,11 @@ Visit <http://localhost:5000>.
 
 ## Screenshots
 
-_Screenshots placeholder — capture the running dashboard at `http://localhost:5000` and drop them into a `docs/` folder._
+_Screenshots placeholder — (Note: The `docs/` folder is not included in the repository by default. You can create it to store your own dashboard captures)._
 
-- `docs/dashboard.png` — main dark-mode dashboard
-- `docs/forecast.png` — forecast overlay on the demand chart
-- `docs/anomalies.png` — anomaly markers on the fault chart
+- `dashboard.png` — main dark-mode dashboard (example)
+- `forecast.png` — forecast overlay on the demand chart (example)
+- `anomalies.png` — anomaly markers on the fault chart (example)
 
 ## Troubleshooting
 
