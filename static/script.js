@@ -205,8 +205,8 @@ async function loadForecast() {
     document.getElementById("peakTime").textContent = "at " + fLabels[peakIdx];
 
     const m = res.metrics || {};
-    document.getElementById("modelMetrics").textContent =
-        `Model R2=${fmt(m.r2, 2)} · MAE=${fmt(m.mae, 1)}`;
+    document.getElementById("forecasterMetrics").textContent =
+        `R²=${fmt(m.r2, 2)} · MAE=${fmt(m.mae, 1)} · RMSE=${fmt(m.rmse, 1)}`;
 }
 
 async function loadFaults() {
@@ -228,6 +228,12 @@ async function loadFaults() {
         addAlert(`Anomaly (${a.severity}) at ${a.timestamp}: ${fmt(a.value)} MWh`,
                  a.severity === "High" ? "danger" : "warn");
     });
+
+    const m = res.metrics || {};
+    if (m.anomaly_f1 !== undefined) {
+        document.getElementById("anomalyMetrics").textContent =
+            `F1=${fmt(m.anomaly_f1, 2)} · Prec=${fmt(m.anomaly_precision, 2)} · Rec=${fmt(m.anomaly_recall, 2)}`;
+    }
 }
 
 async function loadSuggestions() {

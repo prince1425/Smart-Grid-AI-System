@@ -206,6 +206,7 @@ def detect_fault():
                 }
                 for row in df_out.itertuples(index=False)
             ],
+            "metrics": bundle.get("metrics", {}),
         })
     except Exception as exc:
         traceback.print_exc()
